@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
-const adminSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Please provide your email'],
@@ -28,30 +28,29 @@ const adminSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'user'],
+    enum: ['user'],
     default: 'user'
   }
+}, {
+  timestamps: true
 });
 
-// Hash password before saving
-adminSchema.pre('save', async function(next) {
+// Password hashing middleware
+userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified
   if (!this.isModified('password')) return next();
   
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
+  
   next();
 });
 
-// Instance method to check password
-adminSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
-  try {
-    return await bcrypt.compare(candidatePassword, userPassword);
-  } catch (error) {
-    console.error('Error comparing passwords:', error);
-    return false;
-  }
+// Instance method to check if password is correct
+userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
+  return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-const Admin = mongoose.model('Admin', adminSchema);
-module.exports = Admin;
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

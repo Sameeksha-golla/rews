@@ -1,38 +1,121 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Header from './Header';
 import Navbar from './Navbar';
+import { FaTimes } from 'react-icons/fa';
+import { getCurrentUser } from '../utils/userManager';
 import '../styles/Dashboard.css';
 
+const API_URL = 'http://localhost:5001/api/v1';
+
 const Dashboard = () => {
-  // Initialize ticket counts with 0
-  const [openTickets, setOpenTickets] = useState(3);
-  const [inProgressTickets, setInProgressTickets] = useState(2);
-  const [closedTickets, setClosedTickets] = useState(7);
-  const [loading, setLoading] = useState(false);
-  const [userName, setUserName] = useState('USER');
-  const [animateCount, setAnimateCount] = useState(true);
+  const navigate = useNavigate();
   
-  // We're using static data now to avoid errors
+  // Check if user is admin and redirect to admin dashboard if needed
   useEffect(() => {
-    // Get user info from localStorage if available
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
+    const userString = localStorage.getItem('user');
+    if (userString) {
       try {
-        const parsedInfo = JSON.parse(userInfo);
-        if (parsedInfo.name) {
-          setUserName(parsedInfo.name.split(' ')[0]);
+        const user = JSON.parse(userString);
+        if (user.role === 'admin') {
+          navigate('/admin/dashboard');
         }
       } catch (error) {
-        console.error('Error parsing user info:', error);
+        console.error('Error parsing user data:', error);
       }
     }
+  }, [navigate]);
+  // Initialize ticket counts with 0
+  const [openTickets, setOpenTickets] = useState(0);
+  const [inProgressTickets, setInProgressTickets] = useState(0);
+  const [closedTickets, setClosedTickets] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('USER');
+  const [animateCount, setAnimateCount] = useState(false);
+  const [error, setError] = useState('');
+  
+  // State for subcategory popup
+  const [showSubcategories, setShowSubcategories] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [subcategories, setSubcategories] = useState([]);
+  
+  // Fetch tickets and update counts
+  useEffect(() => {
+    // Get current user information
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      setUserName(currentUser.name.split(' ')[0] || 'User');
+      fetchTickets(currentUser);
+    }
   }, []);
+  
+  // Function to fetch tickets and calculate counts
+  const fetchTickets = async (currentUser) => {
+    try {
+      setLoading(true);
+      let userTickets = [];
+      
+      try {
+        // Try to get tickets from API
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/tickets`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        // Filter tickets for current user
+        const apiTickets = response.data.data.tickets || [];
+        userTickets = apiTickets.filter(ticket => ticket.requesterEmail === currentUser.email);
+        
+      } catch (apiErr) {
+        console.error('API Error fetching tickets:', apiErr);
+        
+        // Fallback to localStorage tickets
+        const storedTickets = JSON.parse(localStorage.getItem('mockTickets') || '[]');
+        userTickets = storedTickets.filter(ticket => ticket.requesterEmail === currentUser.email);
+      }
+      
+      // Count tickets by status
+      let open = 0;
+      let inProgress = 0;
+      let closed = 0;
+      
+      userTickets.forEach(ticket => {
+        const status = ticket.status ? ticket.status.toLowerCase() : '';
+        if (status === 'open' || status === 'new') {
+          open++;
+        } else if (status === 'in progress') {
+          inProgress++;
+        } else if (status === 'closed' || status === 'resolved') {
+          closed++;
+        }
+      });
+      
+      // Update state
+      setOpenTickets(open);
+      setInProgressTickets(inProgress);
+      setClosedTickets(closed);
+      setAnimateCount(true);
+      
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+      setError('Failed to load ticket data');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Function to animate counting up
   const AnimatedCounter = ({ end, duration = 2000 }) => {
     const [count, setCount] = useState(0);
     
     useEffect(() => {
+      // Simplified animation - just set the final count immediately
+      // to prevent excessive re-renders
+      setCount(end);
+      
+      // Original animation code (commented out to prevent continuous reloading)
+      /*
       if (!animateCount) return;
       
       let startTime;
@@ -53,12 +136,88 @@ const Dashboard = () => {
       
       animationFrame = requestAnimationFrame(updateCount);
       
-      return () => cancelAnimationFrame(animationFrame);
-    }, [end, duration, animateCount]);
+      return () => {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+        }
+      };
+      */
+    }, [end]); // Only depend on the end value
     
     return <>{count}</>;
   };
 
+  // Service subcategories data
+  const serviceSubcategories = {
+    "Badge & Security": [
+      "New Badge Request",
+      "Badge Replacement",
+      "Access Control Issues",
+      "Security Concerns",
+      "Visitor Passes"
+    ],
+    "Operations": [
+      "Building Maintenance",
+      "HVAC Issues",
+      "Electrical Problems",
+      "Plumbing Services",
+      "Office Furniture"
+    ],
+    "Event Support": [
+      "Conference Room Booking",
+      "Event Setup",
+      "Audio/Visual Support",
+      "Catering Services",
+      "Post-Event Cleanup"
+    ],
+    "Travel & Accommodation": [
+      "Business Travel Request",
+      "Hotel Booking",
+      "Transportation",
+      "Travel Expense Reimbursement",
+      "Travel Policy Inquiries"
+    ],
+    "Concierge Services": [
+      "Mail & Package Handling",
+      "Reception Services",
+      "VIP Support",
+      "Guest Management",
+      "Information Requests"
+    ],
+    "Lost & Found": [
+      "Report Lost Item",
+      "Claim Found Item",
+      "Search Request"
+    ],
+    "Stationery & Business Cards": [
+      "Stationery Request",
+      "Business Card Order",
+      "Branded Materials",
+      "Office Supplies",
+      "Printing Services"
+    ]
+  };
+  
+  // Handle service category click
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+    setSubcategories(serviceSubcategories[category] || []);
+    setShowSubcategories(true);
+  };
+  
+  // Handle subcategory selection
+  const handleSubcategorySelect = (subcategory) => {
+    // Create a URL-friendly version of the subcategory
+    const encodedSubcategory = encodeURIComponent(subcategory);
+    window.location.href = `/create-ticket?category=${encodeURIComponent(selectedCategory)}&subcategory=${encodedSubcategory}`;
+  };
+  
+  // Close the subcategories popup
+  const closeSubcategoriesPopup = () => {
+    setShowSubcategories(false);
+    setSelectedCategory(null);
+  };
+  
   // Our Services data with icons
   const servicesData = {
     "Badge & Security": {
@@ -185,7 +344,7 @@ const Dashboard = () => {
           <div className="services-widget">
             <h2 className="services-title">Our Services</h2>
             <div className="services-grid">
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=badge'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Badge & Security')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
@@ -195,7 +354,7 @@ const Dashboard = () => {
                 </div>
                 <h3 className="category-title">Badge & Security</h3>
               </div>
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=operations'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Operations')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke="currentColor" strokeWidth="2"/>
@@ -203,7 +362,7 @@ const Dashboard = () => {
                 </div>
                 <h3 className="category-title">Operations</h3>
               </div>
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=events'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Event Support')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
@@ -214,7 +373,7 @@ const Dashboard = () => {
                 </div>
                 <h3 className="category-title">Event Support</h3>
               </div>
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=travel'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Travel & Accommodation')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M21 16V8a2 2 0 0 0-1-1.73L12 2 4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73L12 22l8-4.27A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="2"/>
@@ -223,7 +382,7 @@ const Dashboard = () => {
                 </div>
                 <h3 className="category-title">Travel & Accommodation</h3>
               </div>
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=concierge'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Concierge Services')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2"/>
@@ -234,7 +393,7 @@ const Dashboard = () => {
                 </div>
                 <h3 className="category-title">Concierge Services</h3>
               </div>
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=lost'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Lost & Found')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
@@ -244,7 +403,7 @@ const Dashboard = () => {
                 </div>
                 <h3 className="category-title">Lost & Found</h3>
               </div>
-              <div className="service-category" onClick={() => window.location.href = '/create-ticket?category=stationery'} role="button" tabIndex="0">
+              <div className="service-category" onClick={() => handleCategoryClick('Stationery & Business Cards')} role="button" tabIndex="0">
                 <div className="category-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2"/>
@@ -256,6 +415,31 @@ const Dashboard = () => {
                 <h3 className="category-title">Stationery & Business Cards</h3>
               </div>
             </div>
+            
+            {/* Subcategories Popup */}
+            {showSubcategories && (
+              <div className="subcategories-popup-overlay">
+                <div className="subcategories-popup">
+                  <div className="subcategories-header">
+                    <h3>{selectedCategory} - Select Subcategory</h3>
+                    <button className="close-btn" onClick={closeSubcategoriesPopup}>
+                      <FaTimes />
+                    </button>
+                  </div>
+                  <div className="subcategories-list">
+                    {subcategories.map((subcategory, index) => (
+                      <div 
+                        key={index} 
+                        className="subcategory-item" 
+                        onClick={() => handleSubcategorySelect(subcategory)}
+                      >
+                        {subcategory}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,17 +1,18 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const Admin = require('../models/Admin');
+const User = require('../models/User');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
 const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
+  const token = signToken(user._id, user.role);
   
   // Remove password from output
   user.password = undefined;
@@ -33,15 +34,20 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please provide email and password!', 400));
   }
 
-  // 2) Check if user exists && password is correct
-  const user = await Admin.findOne({ email }).select('+password');
+  // 2) First try to find an admin user
+  let user = await Admin.findOne({ email }).select('+password');
+  
+  // If no admin found, try regular user
+  if (!user) {
+    user = await User.findOne({ email }).select('+password');
+  }
 
-  // First check if user exists
+  // If no user found at all
   if (!user) {
     return next(new AppError('Incorrect email or password', 401));
   }
   
-  // Then check if password is correct
+  // Check if password is correct
   const isPasswordCorrect = await user.correctPassword(password, user.password);
   
   if (!isPasswordCorrect) {
@@ -69,12 +75,20 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-
   // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3) Check if user still exists
-  const currentUser = await Admin.findById(decoded.id);
+  let currentUser;
+  
+  // Check if this is an admin user
+  if (decoded.role === 'admin') {
+    currentUser = await Admin.findById(decoded.id);
+  } else {
+    // Check if this is a regular user
+    currentUser = await User.findById(decoded.id);
+  }
+  
   if (!currentUser) {
     return next(
       new AppError('The user belonging to this token no longer exists.', 401)

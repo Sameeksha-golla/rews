@@ -1,0 +1,281 @@
+.assign-ticket-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.assign-ticket-container {
+  display: flex;
+  flex: 1;
+}
+
+.assign-ticket-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f5f7fa;
+}
+
+.assign-ticket-header {
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  color: #1976d2;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+.assign-ticket-header h1 {
+  font-size: 2rem;
+  color: #333;
+  margin: 0;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.assign-ticket-form {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.ticket-summary {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.ticket-summary h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.ticket-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.status-badge,
+.priority-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-open {
+  background-color: #ffecef;
+  color: #e63946;
+}
+
+.status-in-progress {
+  background-color: #fff3e0;
+  color: #ff9800;
+}
+
+.status-resolved {
+  background-color: #e0f7fa;
+  color: #00acc1;
+}
+
+.status-closed {
+  background-color: #e8f5e9;
+  color: #43a047;
+}
+
+.priority-low {
+  background-color: #e8f5e9;
+  color: #43a047;
+}
+
+.priority-medium {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.priority-high {
+  background-color: #fff3e0;
+  color: #ff9800;
+}
+
+.priority-urgent {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.assignment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.current-assignment,
+.new-assignment {
+  margin-bottom: 1rem;
+}
+
+.current-assignment h3,
+.new-assignment h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.current-assignment p {
+  color: #666;
+  font-style: italic;
+}
+
+.admin-selection select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+}
+
+.assignment-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.assign-button,
+.unassign-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.assign-button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+}
+
+.assign-button:hover:not(:disabled) {
+  background-color: #1565c0;
+}
+
+.unassign-button {
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.unassign-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.assign-button:disabled,
+.unassign-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.not-found-message {
+  text-align: center;
+  padding: 3rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.not-found-icon {
+  font-size: 3rem;
+  color: #e63946;
+  margin-bottom: 1rem;
+}
+
+.not-found-message h2 {
+  margin-bottom: 1rem;
+}
+
+.not-found-message p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.back-to-tickets-button {
+  background-color: #1976d2;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.back-to-tickets-button:hover {
+  background-color: #1565c0;
+}
+
+@media (max-width: 768px) {
+  .assign-ticket-content {
+    padding: 1rem;
+  }
+  
+  .ticket-meta {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .assignment-actions {
+    flex-direction: column;
+  }
+}

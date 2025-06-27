@@ -113,6 +113,10 @@
     color: #666;
 }
 
+.my-tickets-content {
+  padding-top: 20px;
+}
+
 .loading-spinner {
     display: flex;
     flex-direction: column;

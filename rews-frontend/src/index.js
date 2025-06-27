@@ -6,10 +6,9 @@ import { BrowserRouter } from 'react-router-dom'; // Import BrowserRouter
 const container = document.getElementById('root');
 const root = createRoot(container);
 
+// Removed StrictMode to prevent double mounting of components which can cause reloading issues
 root.render(
-  <React.StrictMode>
-    <BrowserRouter> {/* Wrap App with BrowserRouter */}
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );

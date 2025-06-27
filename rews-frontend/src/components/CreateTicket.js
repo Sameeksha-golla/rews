@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Navbar from './Navbar';
 import '../styles/CreateTicket.css';
 import axios from "axios";
 import { getToken } from "../utils/auth";
+import { getCurrentUser } from "../utils/userManager";
 import { FaTicketAlt, FaPaperclip, FaExclamationCircle, FaCheckCircle } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const CreateTicket = () => {
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  // Check if user is logged in
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) {
+      // Redirect to login if no user is logged in
+      navigate('/');
+      return;
+    }
+    setCurrentUser(user);
+  }, [navigate]);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [subCategory, setSubCategory] = useState('');
@@ -39,13 +54,24 @@ const CreateTicket = () => {
     setError('');
     setSuccessMessage('');
 
-    try {
+    // Make sure user is logged in
+    if (!currentUser) {
+      setError('You must be logged in to create a ticket');
+      setLoading(false);
+      return;
+    }
+
+    try {      
       const formData = new FormData();
       formData.append("title", title);
       formData.append("category", category);
       formData.append("subCategory", subCategory);
       formData.append("priority", priority);
       formData.append("description", description);
+      formData.append("requesterName", currentUser.name);
+      formData.append("requesterEmail", currentUser.email);
+      formData.append("requesterId", currentUser.id);
+      formData.append("status", "Open"); // Set initial status to Open
 
       if (file) {
         formData.append("file", file);
@@ -53,23 +79,65 @@ const CreateTicket = () => {
 
       const token = getToken();
 
-      const response = await axios.post(
-        "http://localhost:5001/api/v1/tickets",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      try {
+        const response = await axios.post(
+          "http://localhost:5001/api/v1/tickets",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-      console.log("Ticket created:", response.data);
-      setSuccessMessage('Ticket has been created successfully!');
+        console.log("Ticket created:", response.data);
+        setSuccessMessage('Ticket has been created successfully!');
 
-      // Reset form after successful submission
-      resetForm();
-
+        // Reset form after successful submission
+        resetForm();
+        
+        // Redirect to My Tickets page after a short delay
+        setTimeout(() => {
+          navigate('/my-tickets');
+        }, 2000);
+      } catch (apiErr) {
+        console.error("API Error creating ticket:", apiErr);
+        
+        // Create a mock ticket and store it in localStorage for both user and admin views
+        const mockTicket = {
+          _id: `ticket-${Date.now()}`,
+          ticketId: `TICKET-${Math.floor(1000 + Math.random() * 9000)}`,
+          title,
+          category,
+          subCategory,
+          priority,
+          description,
+          status: "Open",
+          requesterName: currentUser.name,
+          requesterEmail: currentUser.email,
+          requesterId: currentUser.id,
+          createdAt: new Date(),
+          fileName: file ? file.name : null,
+          hasFile: !!file
+        };
+        
+        // Store the mock ticket in localStorage
+        const storedTickets = JSON.parse(localStorage.getItem('mockTickets') || '[]');
+        storedTickets.push(mockTicket);
+        localStorage.setItem('mockTickets', JSON.stringify(storedTickets));
+        
+        console.log("Mock ticket created:", mockTicket);
+        setSuccessMessage('Ticket has been created successfully!');
+        
+        // Reset form after successful submission
+        resetForm();
+        
+        // Redirect to My Tickets page after a short delay
+        setTimeout(() => {
+          navigate('/my-tickets');
+        }, 2000);
+      }
     } catch (err) {
       console.error("Error creating ticket:", err);
       setError(

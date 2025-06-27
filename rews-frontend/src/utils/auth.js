@@ -2,7 +2,11 @@
 import axios from "axios";
 export const isAuthenticated = () => {
   const token = localStorage.getItem("token");
-  return !!token; // Returns true if token exists, false otherwise
+  if (!token) return false;
+  
+  // Additional validation could be added here if needed
+  // For now, just check if token exists
+  return true;
 };
 
 // Get the stored authentication token
@@ -23,9 +27,16 @@ export const logout = () => {
   window.location.href = "/";
 };
 
-// Set up axios defaults
+// Flag to prevent multiple setup calls
+let interceptorsSetup = false;
+
+// Set up axios defaults - with safeguards against repeated setup
 export const setupAxiosInterceptors = () => {
-  axios.interceptors.request.use(
+  // Only set up interceptors once to prevent memory leaks and loops
+  if (interceptorsSetup) return;
+  
+  // Add request interceptor for auth token
+  const requestInterceptor = axios.interceptors.request.use(
     (config) => {
       const token = getToken();
       if (token) {
@@ -39,13 +50,22 @@ export const setupAxiosInterceptors = () => {
   );
 
   // Add response interceptor to handle 401 Unauthorized responses
-  axios.interceptors.response.use(
+  // Added a simple debounce mechanism to prevent logout loops
+  let logoutInProgress = false;
+  const responseInterceptor = axios.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 401) {
-        logout();
+      if (error.response?.status === 401 && !logoutInProgress) {
+        logoutInProgress = true;
+        // Add small delay to prevent immediate re-authentication attempts
+        setTimeout(() => {
+          logout();
+          logoutInProgress = false;
+        }, 100);
       }
       return Promise.reject(error);
     }
   );
+  
+  interceptorsSetup = true;
 };

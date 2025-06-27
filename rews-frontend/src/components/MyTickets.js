@@ -4,6 +4,7 @@ import Header from "./Header";
 import Navbar from "./Navbar";
 import axios from "axios";
 import { getToken } from "../utils/auth";
+import { getCurrentUser } from "../utils/userManager";
 import { FaFile, FaFilePdf, FaFileWord, FaFileExcel, FaFileImage, FaDownload, FaTicketAlt, FaSearch, FaFilter } from "react-icons/fa";
 
 // Helper function to get appropriate icon based on file extension
@@ -131,19 +132,80 @@ const MyTickets = () => {
   const fetchTickets = async () => {
     setLoading(true);
     try {
-      // The axios interceptor will automatically add the token
-      const response = await axios.get("http://localhost:5001/api/v1/tickets");
-      console.log("Fetched tickets:", response.data);
-      setTickets(response.data.data.tickets || []);
+      // Get current user information
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        console.error('No user logged in');
+        setTickets([]);
+        setLoading(false);
+        return;
+      }
+      
+      // First get any mock tickets from localStorage to ensure we have the latest data
+      const storedMockTickets = JSON.parse(localStorage.getItem('mockTickets') || '[]');
+      
+      try {
+        const token = getToken();
+        const response = await axios.get("http://localhost:5001/api/v1/tickets", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        // Filter tickets to only show those created by the current user
+        const allTickets = response.data.data.tickets || [];
+        const apiUserTickets = allTickets.filter(ticket => {
+          return ticket.requesterEmail === currentUser.email;
+        });
+        
+        // Filter mock tickets for the current user
+        const mockUserTickets = storedMockTickets.filter(ticket => {
+          return ticket.requesterEmail === currentUser.email;
+        });
+        
+        // Combine API tickets and mock tickets, avoiding duplicates
+        const combinedTickets = [...apiUserTickets];
+        
+        // Add mock tickets that don't exist in API response
+        mockUserTickets.forEach(mockTicket => {
+          const exists = combinedTickets.some(ticket => ticket._id === mockTicket._id);
+          if (!exists) {
+            combinedTickets.push(mockTicket);
+          }
+        });
+        
+        console.log(`Found ${combinedTickets.length} tickets for user ${currentUser.email}`);
+        setTickets(combinedTickets);
+      } catch (apiErr) {
+        console.error("API Error fetching tickets:", apiErr);
+        
+        // Filter mock tickets for the current user
+        const userTickets = storedMockTickets.filter(ticket => {
+          return ticket.requesterEmail === currentUser.email;
+        });
+          
+        console.log(`Displaying ${userTickets.length} mock tickets for user ${currentUser.email}`);
+        setTickets(userTickets);
+      }
     } catch (error) {
-      console.error("Error fetching tickets:", error.response?.data || error.message);
+      console.error("Error fetching tickets:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  // Only fetch tickets on mount, don't set up auto-refresh to prevent excessive reloads
   useEffect(() => {
     fetchTickets();
+    
+    // No auto-refresh interval - this may have been causing the continuous reloading
+    // Uncomment if you need this feature after fixing the reloading issue
+    /*
+    const intervalId = setInterval(() => {
+      fetchTickets();
+    }, 5000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+    */
   }, []);
 
   // Filter tickets based on search term, categories, statuses, and date range
@@ -183,16 +245,16 @@ const MyTickets = () => {
               <div className="filter-controls">
                 <div className="search-filter">
                   <div className="ticket-search">
-                    <input 
-                      type="text" 
-                      placeholder="Search by Ticket ID" 
+                    <input
+                      type="text"
+                      placeholder="Search by Ticket ID"
                       value={ticketIdSearch}
                       onChange={(e) => setTicketIdSearch(e.target.value)}
                       className="ticket-search-input"
                     />
                     {/* Date Range Dropdown */}
-                    <select 
-                      value={dateRange} 
+                    <select
+                      value={dateRange}
                       onChange={(e) => setDateRange(e.target.value)}
                       className="sort-select"
                     >
@@ -205,7 +267,6 @@ const MyTickets = () => {
                 </div>
               </div>
             </div>
-
             {/* Tickets table */}
             <div className="tickets-table-wrapper">
               {loading ? (
@@ -217,7 +278,9 @@ const MyTickets = () => {
                 <div className="no-tickets">
                   <FaTicketAlt className="no-tickets-icon" />
                   <h2>No Tickets Yet</h2>
-                  <p>Create your first ticket to get started with REWS services.</p>
+                  <p>
+                    Create your first ticket to get started with REWS services.
+                  </p>
                 </div>
               ) : filteredTickets.length === 0 ? (
                 <div className="no-tickets">
@@ -231,6 +294,7 @@ const MyTickets = () => {
                       <th>Ticket ID</th>
                       <th>Title</th>
                       <th>Category</th>
+                      <th>Subcategory</th>
                       <th>Status</th>
                       <th>Created Date</th>
                       <th>Attachment</th>
@@ -241,23 +305,42 @@ const MyTickets = () => {
                       <tr key={index}>
                         <td className="ticket-id">{data._id}</td>
                         <td className="ticket-title">{data.title}</td>
-                        <td className="ticket-category">{data.subCategory}</td>
+                        <td className="ticket-category">
+                          {data.category || "N/A"}
+                        </td>
+                        <td className="ticket-subcategory">
+                          {data.subCategory || "N/A"}
+                        </td>
                         <td>
-                          <span className={`status-badge ${(data.status || 'new').toLowerCase().replace(' ', '-')}`}>
-                            {data.status || 'NEW'}
+                          <span
+                            className={`status-badge ${(data.status || "new")
+                              .toLowerCase()
+                              .replace(" ", "-")}`}
+                          >
+                            {data.status || "NEW"}
                           </span>
                         </td>
-                        <td className="ticket-date">{new Date(data.createdAt).toLocaleDateString()}</td>
+                        <td className="ticket-date">
+                          {new Date(data.createdAt).toLocaleDateString()}
+                        </td>
                         <td className="ticket-attachment">
                           {data.fileName || data.hasFile ? (
                             <div className="attachment-item">
                               <span className="attachment-icon">📎</span>
-                              <button 
-                                onClick={() => handleFileClick(data._id, data.fileName, data.fileContentType)}
+                              <button
+                                onClick={() =>
+                                  handleFileClick(
+                                    data._id,
+                                    data.fileName,
+                                    data.fileContentType
+                                  )
+                                }
                                 className="file-link"
-                                title={data.fileName || 'View attachment'}
+                                title={data.fileName || "View attachment"}
                               >
-                                <span className="attachment-name">{truncateFileName(data.fileName || 'File')}</span>
+                                <span className="attachment-name">
+                                  {truncateFileName(data.fileName || "File")}
+                                </span>
                               </button>
                             </div>
                           ) : (

@@ -1,0 +1,232 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+}
+
+.admin-dashboard-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-dashboard-content > * {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-dashboard-header {
+  margin-bottom: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+.admin-dashboard-header h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-dashboard-header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.admin-stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: center;
+}
+
+.admin-stat-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-stat-card h3 {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.admin-dashboard-sections {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+.admin-chart-section, .admin-recent-tickets {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-chart-section h2, .admin-recent-tickets h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.75rem;
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+.admin-tickets-table {
+  overflow-x: auto;
+}
+
+.admin-tickets-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-tickets-table th, .admin-tickets-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-tickets-table th {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.admin-tickets-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.admin-tickets-table tbody tr:hover {
+  background-color: #edf7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Specific styling for the ticket rows in admin dashboard */
+.ticket-row {
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.ticket-row:hover td {
+  color: #1976d2;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-open {
+  background-color: #ffecef;
+  color: #e63946;
+}
+
+.status-progress {
+  background-color: #fff3e0;
+  color: #ff9800;
+}
+
+.status-resolved {
+  background-color: #e0f7fa;
+  color: #00acc1;
+}
+
+.status-closed {
+  background-color: #e8f5e9;
+  color: #43a047;
+}
+
+.view-all-link {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.view-all-link a {
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.view-all-link a:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .admin-dashboard-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .admin-dashboard-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats-cards {
+    grid-template-columns: 1fr;
+  }
+}

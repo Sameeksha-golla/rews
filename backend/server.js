@@ -72,8 +72,19 @@ app.use((req, res, next) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tickets', ticketRoutes);
 
+// Special handling for webpack hot-update.json requests to prevent errors
+app.get('*.hot-update.json', (req, res) => {
+  // Return an empty JSON response instead of triggering a 404 error
+  // This prevents continuous error logging during development
+  res.json({});
+});
+
 // Handle unhandled routes
 app.all('*', (req, res, next) => {
+  // Skip error for webpack hot-update.json files
+  if (req.originalUrl.includes('.hot-update.json')) {
+    return res.json({});
+  }
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
