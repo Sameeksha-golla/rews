@@ -1,0 +1,71 @@
+/* Navbar.css */
+.main-nav {
+  background-color: #f8f9fabd; /* Light background for the tab area */
+  padding: 0;
+  width: 100%;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+.nav-tabs {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: none;
+}
+
+.main-nav li {
+  margin-right: 5px;
+  position: relative;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: #495057;
+  padding: 10px 20px;
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+  background-color: #e9ecef;
+  border-radius: 5px 5px 0 0;
+}
+
+.main-nav a:hover {
+  background-color: #dee2e6;
+  color: #212529;
+}
+
+/* Active state for NavLink - this will work dynamically */
+.main-nav a.active {
+  background-color: #fff; /* White background for active tab */
+  color: #ff6b35; /* Orange text for active state */
+  font-weight: 600;
+  border-bottom: 3px solid #ff6b35;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .main-nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 15px;
+  }
+
+  .main-nav li {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .main-nav a {
+    padding: 10px 0;
+  }
+}

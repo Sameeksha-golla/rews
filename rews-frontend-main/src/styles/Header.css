@@ -1,0 +1,72 @@
+/* Header.css */
+.site-header {
+    background-color: #2c2c2c; /* Dark background matching the screenshot */
+    color: #fff;
+    padding: 15px 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Full width instead of max-width container */
+}
+
+.logo {
+    /* Position logo at extreme left */
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-image {
+    display: flex;
+    align-items: center;
+}
+
+.logo-icon-image {
+    height: 45px; /* Slightly larger to match the image */
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align to the top/left */
+    align-items: flex-start; /* Align text to the left */
+}
+
+.logo-text h1 {
+    margin: 0;
+    font-size: 28px; /* Larger font size to match the image */
+    font-weight: bold;
+    color: #fdf6f3;
+    line-height: 1.1; /* Tighter line height */
+    letter-spacing: 0.5px; /* Slight letter spacing for better visibility */
+}
+
+.logo-text p {
+    margin: 0;
+    font-size: 11px; /* Slightly smaller subheading */
+    color: #bbb; /* Slightly lighter gray for better contrast */
+    margin-top: 3px; /* Small gap between heading and subheading */
+    font-weight: 300; /* Lighter font weight for subtitle */
+    letter-spacing: 0.8px; /* More letter spacing for the subtitle */
+    text-transform: uppercase; /* Make it uppercase to match professional look */
+}
+
+.contact-info {
+    text-align: right;
+    font-size: 14px;
+    /* Position contact details at extreme right */
+}
+
+.contact-info p {
+    margin: 2px 0;
+    color: #ccc;
+}

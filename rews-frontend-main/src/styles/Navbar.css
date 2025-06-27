@@ -1,0 +1,43 @@
+/* Navbar.css */
+.main-nav {
+    background-color: #f8f9fa; /* Light background matching the screenshot */
+    padding: 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.main-nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    width: 100%; /* Full width instead of max-width container */
+    padding-left: 30px; /* Align to extreme left with minimal space */
+}
+
+.main-nav li {
+    margin-right: 30px; /* Space between nav items */
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: #333;
+    padding: 30px 0;
+    padding-bottom:10px;
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.main-nav a:hover {
+    color: #ff6b35; /* Orange color on hover */
+    border-bottom: 3px solid #ff6b35;
+}
+
+/* Active state for NavLink - this will work dynamically */
+.main-nav a.active {
+    color: #ff6b35 !important; /* Orange color for active state */
+    border-bottom: 3px solid #ff6b35 !important;
+}

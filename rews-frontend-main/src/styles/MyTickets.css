@@ -1,0 +1,523 @@
+/* MyTickets page styling with full-height filters and dropdown functionality */
+
+/* Fixed header and navbar positioning */
+.header-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #2c2c2c;
+}
+
+.navbar-section {
+  position: fixed;
+  top: 73px; /* Position below header */
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background-color: #f8f9fa;
+}
+
+/* Main page container - no padding top, directly below navbar */
+.my-tickets-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-top: 130px; /* Reduced padding - just header + navbar height */
+}
+
+.tickets-layout {
+  display: flex;
+  min-height: calc(100vh - 130px); /* Adjusted for reduced padding */
+  gap: 0;
+}
+
+/* Sidebar filters - full viewport height with vertical scroll */
+.filters-sidebar {
+  width: 280px;
+  background-color: white;
+  border-right: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  top: 130px; /* Positioned directly below navbar */
+  height: calc(100vh - 130px); /* Full remaining height */
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.filters-content {
+  padding: 24px;
+  min-height: 100%;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.filters-header h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+/* Clear All button positioned at extreme right */
+.clear-all-right {
+  background: none;
+  border: none;
+  color: #ff6b35;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  margin-left: auto;
+}
+
+.clear-all-right:hover {
+  text-decoration: underline;
+}
+
+.filter-section {
+  margin-bottom: 24px;
+}
+
+/* Dropdown styling */
+.filter-dropdown {
+  position: relative;
+}
+
+.dropdown-header {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c2c;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.dropdown-header:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.dropdown-header:focus {
+  outline: none;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  color: #6c757d;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Category dropdown - no vertical scroll */
+.category-dropdown {
+  max-height: none;
+  overflow-y: visible;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 16px;
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-item:hover {
+  background-color: #f8f9fa;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Main content area - adjusted for fixed sidebar */
+.tickets-content {
+  flex: 1;
+  background-color: white;
+  padding: 32px;
+  margin-left: 280px; /* Account for fixed sidebar */
+  overflow-x: auto;
+}
+
+.tickets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.tickets-header h2 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+/* Header controls container for search and dropdown */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Ticket ID search input */
+.ticket-search-input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.ticket-search-input:focus {
+  outline: none;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.ticket-search-input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.sort-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+/* Table styling */
+.tickets-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tickets-table {
+    width: 100%;
+    border-collapse: collapse;
+  min-width: 900px; /* Increased for attachment column */
+}
+
+.tickets-table th {
+  background-color: #f8f9fa;
+  color: #2c2c2c;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px 12px;
+  text-align: left;
+  border-bottom: 2px solid #e9ecef;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tickets-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 14px;
+  color: #495057;
+  vertical-align: middle;
+}
+
+.tickets-table tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.tickets-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Table cell specific styling */
+.ticket-id {
+  font-weight: 600;
+  color: #2c2c2c;
+  font-family: 'Courier New', monospace;
+}
+
+.ticket-title {
+  font-weight: 500;
+  color: #2c2c2c;
+  max-width: 200px;
+}
+
+.ticket-category {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #6c757d;
+}
+
+.ticket-date {
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.ticket-time {
+  color: #6c757d;
+  font-weight: 400;
+}
+
+/* Attachment column styling */
+.ticket-attachment {
+  max-width: 150px;
+  word-wrap: break-word;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+.attachment-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.attachment-name {
+  font-size: 12px;
+  color: #495057;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.attachment-name:hover {
+  color: #ff6b35;
+  text-decoration: underline;
+}
+
+.no-attachment {
+  font-size: 12px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Status badges in table - updated for new statuses */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.status-badge.new {
+  background-color: #e7f3ff;
+  color: #0066cc;
+  border: 1px solid #b3d9ff;
+}
+
+.status-badge.in-progress {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.status-badge.onhold {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-badge.closed {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* No tickets message */
+.no-tickets {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  background-color: white;
+  border-radius: 8px;
+}
+
+/* Custom scrollbar for filters */
+.filters-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filters-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .tickets-content {
+    padding: 20px;
+  }
+  
+  .tickets-header h2 {
+    font-size: 28px;
+  }
+  
+  .header-controls {
+    gap: 12px;
+  }
+  
+  .ticket-search-input {
+    width: 160px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .filters-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+  }
+  
+  .tickets-content {
+    margin-left: 0;
+  }
+  
+  .tickets-layout {
+    flex-direction: column;
+  }
+  
+  .dropdown-content {
+    position: static;
+    box-shadow: none;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-top: 8px;
+  }
+  
+  .category-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .my-tickets-page {
+    padding-top: 110px; /* Reduced for mobile */
+  }
+  
+  .filters-sidebar {
+    top: 110px;
+    height: calc(100vh - 110px);
+  }
+  
+  .tickets-content {
+    padding: 16px;
+  }
+  
+  .tickets-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .ticket-search-input {
+    width: 140px;
+  }
+  
+  .filters-content {
+    padding: 16px;
+  }
+  
+  .tickets-table th,
+  .tickets-table td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  
+  .tickets-header h2 {
+    font-size: 24px;
+  }
+  
+  .filters-sidebar {
+    height: 300px;
+  }
+}
